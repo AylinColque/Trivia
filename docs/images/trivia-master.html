@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trivia Master</title>
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #b8e8ff;
+    --bg-soft: #e8f8ff;
+    --card: #ffffff;
+    --navy: #0d1b4c;
+    --navy-soft: #1a2a6c;
+    --pink: #ff2d8a;
+    --cyan: #00d4ff;
+    --yellow: #ffe03a;
+    --lime: #5dff4a;
+    --orange: #ff8c1a;
+    --purple: #a855ff;
+    --text: #0d1b4c;
+    --muted: #3d4f8a;
+    --border: #a8d4f0;
+    --shadow: 0 20px 50px rgba(13, 27, 76, 0.18);
+}
+
+body {
+    min-height: 100vh;
+    font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+    background:
+        radial-gradient(ellipse at 15% 20%, rgba(255, 45, 138, 0.35), transparent 40%),
+        radial-gradient(ellipse at 85% 15%, rgba(0, 212, 255, 0.4), transparent 38%),
+        radial-gradient(ellipse at 75% 80%, rgba(168, 85, 255, 0.3), transparent 42%),
+        radial-gradient(ellipse at 20% 85%, rgba(255, 224, 58, 0.28), transparent 40%),
+        radial-gradient(ellipse at 50% 50%, rgba(93, 255, 74, 0.12), transparent 50%),
+        linear-gradient(160deg, #7dd8ff 0%, #a8e6ff 35%, #c4f0ff 70%, #9ee0ff 100%);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 18px;
+}
+
+.container {
+    width: 100%;
+    max-width: 980px;
+}
+
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* ========== PORTADA ========== */
+.cover {
+    background:
+        radial-gradient(circle at 20% 30%, rgba(255, 45, 138, 0.25), transparent 45%),
+        radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.3), transparent 40%),
+        radial-gradient(circle at 70% 75%, rgba(168, 85, 255, 0.22), transparent 45%),
+        radial-gradient(circle at 25% 80%, rgba(255, 224, 58, 0.2), transparent 40%),
+        linear-gradient(175deg, #5ecfff 0%, #7dd9ff 25%, #a0e8ff 55%, #c8f4ff 100%);
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow:
+        0 25px 60px rgba(13, 27, 76, 0.25),
+        0 0 0 4px rgba(255, 255, 255, 0.5),
+        0 0 40px rgba(0, 212, 255, 0.35);
+    position: relative;
+    min-height: 580px;
+    display: flex;
+    flex-direction: column;
+}
+
+.cover-top {
+    flex: 1;
+    padding: 32px 28px 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 2;
+}
+
+.quiz-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(90deg, #0d1b4c, #1a2a6c);
+    color: white;
+    font-weight: 900;
+    letter-spacing: 4px;
+    font-size: 14px;
+    padding: 10px 18px 10px 20px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+    box-shadow:
+        0 10px 28px rgba(13, 27, 76, 0.4),
+        0 0 0 3px rgba(255, 255, 255, 0.35);
+}
+
+.color-dots {
+    display: flex;
+    gap: 5px;
+}
+
+.color-dots span {
+    width: 16px;
+    height: 16px;
+    border-radius: 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.color-dots span:nth-child(1) { background: var(--pink); }
+.color-dots span:nth-child(2) { background: var(--cyan); }
+.color-dots span:nth-child(3) { background: var(--yellow); }
+.color-dots span:nth-child(4) { background: var(--lime); }
+.color-dots span:nth-child(5) { background: var(--orange); }
+.color-dots span:nth-child(6) { background: var(--purple); }
+
+.cover-title {
+    font-size: clamp(56px, 14vw, 100px);
+    font-weight: 900;
+    line-height: 0.92;
+    letter-spacing: -3px;
+    background: linear-gradient(135deg, #0d1b4c 0%, #1a2a6c 40%, #3b1a6e 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 6px 0 rgba(255, 45, 138, 0.25))
+            drop-shadow(0 12px 20px rgba(13, 27, 76, 0.2));
+    margin-bottom: 6px;
+    position: relative;
+}
+
+.cover-title::after {
+    content: "TRIVIA";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shine 3s ease-in-out infinite;
+}
+
+@keyframes shine {
+    0%, 100% { opacity: 0; transform: translateX(-20%); }
+    50% { opacity: 1; transform: translateX(20%); }
+}
+
+.cover-subtitle {
+    font-size: clamp(15px, 3.2vw, 20px);
+    font-weight: 800;
+    letter-spacing: 8px;
+    color: #0d1b4c;
+    margin-bottom: 26px;
+    text-shadow: 0 2px 0 rgba(255,255,255,0.5);
+    opacity: 0.85;
+}
+
+.cover-visual {
+    position: relative;
+    width: min(240px, 52vw);
+    height: min(240px, 52vw);
+    margin: 6px auto 16px;
+}
+
+.wheel {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--pink) 0deg 60deg,
+        var(--cyan) 60deg 120deg,
+        var(--yellow) 120deg 180deg,
+        var(--lime) 180deg 240deg,
+        var(--orange) 240deg 300deg,
+        var(--purple) 300deg 360deg
+    );
+    border: 12px solid #0d1b4c;
+    box-shadow:
+        0 16px 40px rgba(13, 27, 76, 0.35),
+        0 0 30px rgba(0, 212, 255, 0.4),
+        0 0 50px rgba(255, 45, 138, 0.25),
+        inset 0 0 0 8px rgba(255,255,255,0.4);
+    animation: spinSlow 10s linear infinite;
+    position: relative;
+}
+
+.wheel::after {
+    content: "";
+    position: absolute;
+    inset: 26%;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #ffffff, #e0f6ff);
+    border: 7px solid #0d1b4c;
+    box-shadow:
+        inset 0 0 16px rgba(13, 27, 76, 0.1),
+        0 4px 12px rgba(0,0,0,0.1);
+}
+
+.sparkles {
+    position: absolute;
+    inset: -24px;
+    pointer-events: none;
+}
+
+.sparkle {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    animation: float 2.4s ease-in-out infinite;
+    box-shadow: 0 0 12px currentColor;
+}
+
+.sparkle:nth-child(1) { top: 4%; left: 10%; background: var(--pink); color: var(--pink); animation-delay: 0s; }
+.sparkle:nth-child(2) { top: 14%; right: 2%; background: var(--cyan); color: var(--cyan); animation-delay: 0.3s; }
+.sparkle:nth-child(3) { bottom: 18%; left: 0%; background: var(--yellow); color: var(--yellow); animation-delay: 0.6s; }
+.sparkle:nth-child(4) { bottom: 4%; right: 12%; background: var(--purple); color: var(--purple); animation-delay: 0.9s; }
+.sparkle:nth-child(5) { top: 46%; left: -10%; background: var(--lime); color: var(--lime); animation-delay: 0.4s; }
+.sparkle:nth-child(6) { top: 40%; right: -8%; background: var(--orange); color: var(--orange); animation-delay: 0.7s; }
+
+@keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) scale(1); opacity: 0.85; }
+    50% { transform: translateY(-12px) scale(1.25); opacity: 1; }
+}
+
+.cover-bottom {
+    background: linear-gradient(90deg, #0d1b4c 0%, #1a2a6c 50%, #0d1b4c 100%);
+    padding: 24px 24px 28px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 -8px 30px rgba(13, 27, 76, 0.2);
+}
+
+.play-btn {
+    width: 100%;
+    max-width: 340px;
+    border: none;
+    background: linear-gradient(90deg, #ff2d8a, #a855ff, #00d4ff);
+    background-size: 200% 100%;
+    color: white;
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: 5px;
+    padding: 18px 32px;
+    border-radius: 18px;
+    cursor: pointer;
+    box-shadow:
+        0 10px 30px rgba(255, 45, 138, 0.45),
+        0 0 0 4px rgba(255, 255, 255, 0.35);
+    transition: 0.25s;
+    animation: btnGlow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes btnGlow {
+    from { background-position: 0% 50%; box-shadow: 0 10px 30px rgba(255, 45, 138, 0.45), 0 0 0 4px rgba(255,255,255,0.35); }
+    to { background-position: 100% 50%; box-shadow: 0 10px 35px rgba(0, 212, 255, 0.5), 0 0 0 4px rgba(255,255,255,0.4); }
+}
+
+.play-btn:hover {
+    transform: translateY(-4px) scale(1.04);
+    filter: brightness(1.1);
+}
+
+.floating-shapes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 14px;
+    opacity: 0.75;
+    animation: bob 4s ease-in-out infinite;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.shape.s1 { width: 56px; height: 56px; background: var(--pink); top: 10%; left: 5%; transform: rotate(18deg); animation-delay: 0s; }
+.shape.s2 { width: 42px; height: 42px; background: var(--cyan); top: 18%; right: 6%; transform: rotate(-12deg); border-radius: 50%; animation-delay: 0.5s; }
+.shape.s3 { width: 34px; height: 34px; background: var(--yellow); bottom: 36%; left: 8%; transform: rotate(30deg); animation-delay: 1s; }
+.shape.s4 { width: 52px; height: 22px; background: var(--purple); top: 55%; right: 5%; transform: rotate(-20deg); border-radius: 20px; animation-delay: 0.7s; }
+.shape.s5 { width: 28px; height: 28px; background: var(--lime); bottom: 40%; right: 12%; border-radius: 50%; animation-delay: 1.2s; }
+.shape.s6 { width: 40px; height: 40px; background: var(--orange); top: 68%; left: 7%; transform: rotate(45deg); animation-delay: 0.3s; }
+.shape.s7 { width: 20px; height: 20px; background: var(--pink); top: 42%; left: 14%; border-radius: 50%; animation-delay: 1.5s; opacity: 0.6; }
+.shape.s8 { width: 26px; height: 26px; background: var(--cyan); bottom: 28%; right: 18%; transform: rotate(20deg); animation-delay: 0.9s; opacity: 0.65; }
+
+@keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+    50% { transform: translateY(-14px) rotate(calc(var(--r, 0deg) + 8deg)); }
+}
+
+/* ========== RESTO DE PANTALLAS — súper colorido ========== */
+.card {
+    background:
+        radial-gradient(circle at 10% 0%, rgba(255, 45, 138, 0.12), transparent 40%),
+        radial-gradient(circle at 90% 10%, rgba(0, 212, 255, 0.14), transparent 40%),
+        radial-gradient(circle at 80% 90%, rgba(168, 85, 255, 0.12), transparent 40%),
+        rgba(255, 255, 255, 0.94);
+    border: 4px solid rgba(255, 255, 255, 0.85);
+    border-radius: 28px;
+    padding: 28px;
+    box-shadow:
+        0 20px 50px rgba(13, 27, 76, 0.18),
+        0 0 0 3px rgba(0, 212, 255, 0.25),
+        0 0 40px rgba(255, 45, 138, 0.12);
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: "";
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, rgba(255, 224, 58, 0.35), transparent 70%);
+    pointer-events: none;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo h1 {
+    font-size: clamp(28px, 6vw, 42px);
+    font-weight: 900;
+    background: linear-gradient(90deg, #ff2d8a, #a855ff, #00d4ff, #ffe03a);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -1px;
+    animation: titleShift 4s linear infinite;
+}
+
+@keyframes titleShift {
+    to { background-position: 200% center; }
+}
+
+.logo p {
+    margin-top: 6px;
+    color: var(--navy);
+    font-weight: 800;
+    font-size: 15px;
+    opacity: 0.75;
+}
+
+.section-title {
+    font-size: 15px;
+    font-weight: 900;
+    margin: 18px 0 12px;
+    color: var(--navy);
+    letter-spacing: 0.4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.name-input {
+    width: 100%;
+    padding: 15px 18px;
+    border-radius: 16px;
+    border: 3px solid transparent;
+    background:
+        linear-gradient(white, white) padding-box,
+        linear-gradient(90deg, var(--pink), var(--cyan), var(--purple)) border-box;
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 600;
+    outline: none;
+    transition: 0.2s;
+    box-shadow: 0 6px 18px rgba(0, 212, 255, 0.12);
+}
+
+.name-input:focus {
+    box-shadow: 0 0 0 5px rgba(168, 85, 255, 0.2), 0 8px 22px rgba(255, 45, 138, 0.15);
+    transform: scale(1.01);
+}
+
+.topics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.topic {
+    padding: 14px 8px;
+    border: 3px solid rgba(13, 27, 76, 0.12);
+    background: linear-gradient(160deg, #ffffff, #e8f8ff);
+    color: var(--navy);
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 800;
+    transition: 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.topic:nth-child(1) { border-bottom: 4px solid var(--cyan); }
+.topic:nth-child(2) { border-bottom: 4px solid var(--orange); }
+.topic:nth-child(3) { border-bottom: 4px solid var(--purple); }
+.topic:nth-child(4) { border-bottom: 4px solid var(--pink); }
+.topic:nth-child(5) { border-bottom: 4px solid var(--lime); }
+.topic:nth-child(6) { border-bottom: 4px solid var(--yellow); }
+.topic:nth-child(7) { border-bottom: 4px solid var(--cyan); }
+.topic:nth-child(8) { border-bottom: 4px solid var(--pink); }
+
+.topic:hover {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+.topic.selected {
+    background: linear-gradient(135deg, var(--pink), var(--purple), var(--cyan));
+    border-color: transparent;
+    border-bottom-color: transparent;
+    color: white;
+    box-shadow: 0 10px 28px rgba(255, 45, 138, 0.45);
+    transform: translateY(-2px);
+}
+
+.settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 22px 0;
+}
+
+.setting-box {
+    background: linear-gradient(160deg, #ffffff, #f0fbff);
+    border: 3px solid rgba(0, 212, 255, 0.25);
+    padding: 16px;
+    border-radius: 18px;
+    box-shadow: 0 6px 16px rgba(0, 212, 255, 0.1);
+}
+
+.setting-box:nth-child(2) {
+    border-color: rgba(255, 45, 138, 0.25);
+    box-shadow: 0 6px 16px rgba(255, 45, 138, 0.1);
+}
+
+.setting-box label {
+    display: block;
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 900;
+    margin-bottom: 10px;
+}
+
+.setting-box select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    border: 2px solid rgba(13, 27, 76, 0.12);
+    background: white;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.start-btn, .next-btn, .restart-btn, .home-btn {
+    width: 100%;
+    border: none;
+    padding: 17px;
+    border-radius: 16px;
+    color: white;
+    font-size: 17px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.25s;
+    letter-spacing: 0.5px;
+}
+
+.start-btn, .next-btn, .restart-btn {
+    background: linear-gradient(90deg, #ff2d8a, #a855ff, #00d4ff);
+    background-size: 200% 100%;
+    box-shadow: 0 10px 28px rgba(255, 45, 138, 0.4);
+    animation: btnShift 3s ease infinite alternate;
+}
+
+@keyframes btnShift {
+    from { background-position: 0% 50%; }
+    to { background-position: 100% 50%; }
+}
+
+.start-btn:hover, .next-btn:hover, .restart-btn:hover, .home-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-3px) scale(1.02);
+}
+
+/* ===== GAME HUD ===== */
+.game-top {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.stat {
+    min-width: 0;
+    padding: 14px 8px;
+    text-align: center;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 8px 20px rgba(13, 27, 76, 0.1);
+    border: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat:nth-child(1) {
+    border-color: rgba(255, 224, 58, 0.5);
+    background: linear-gradient(180deg, #fffceb, #fff8d6);
+}
+.stat:nth-child(2) {
+    border-color: rgba(0, 212, 255, 0.45);
+    background: linear-gradient(180deg, #e8faff, #d0f4ff);
+}
+.stat:nth-child(4) {
+    border-color: rgba(93, 255, 74, 0.45);
+    background: linear-gradient(180deg, #eefee9, #d8fcd0);
+}
+
+.stat-title {
+    color: var(--navy);
+    font-size: 12px;
+    font-weight: 800;
+    opacity: 0.7;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 900;
+    margin-top: 4px;
+    color: var(--navy);
+}
+
+.game-top .timer-stat {
+    background: linear-gradient(180deg, #ffe0ec, #ffc2d8);
+    border: 3px solid var(--pink);
+    box-shadow: 0 0 24px rgba(255, 45, 138, 0.35);
+}
+
+.timer {
+    display: inline-block;
+    min-width: 72px;
+    padding: 6px 12px;
+    border-radius: 14px;
+    color: white;
+    background: linear-gradient(135deg, #ff2d8a, #ff0040);
+    border: 3px solid #ffb3d0;
+    font-size: 30px;
+    line-height: 1.1;
+    font-weight: 900;
+    text-align: center;
+    box-shadow: 0 0 18px rgba(255, 45, 138, 0.7);
+    animation: timerPulse 1s infinite alternate;
+}
+
+.timer.danger {
+    background: #b00020;
+    border-color: #fff;
+    box-shadow: 0 0 22px #ff1744, 0 0 40px #ff1744;
+    animation: timerPulse 0.3s infinite alternate;
+}
+
+@keyframes timerPulse {
+    from { transform: scale(1); }
+    to { transform: scale(1.08); }
+}
+
+.progress-container {
+    height: 14px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    border: 2px solid rgba(13, 27, 76, 0.1);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.progress {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, #ff2d8a, #a855ff, #00d4ff, #ffe03a);
+    background-size: 200% 100%;
+    transition: width 0.35s;
+    animation: progressShine 2s linear infinite;
+    border-radius: 20px;
+    box-shadow: 0 0 12px rgba(255, 45, 138, 0.4);
+}
+
+@keyframes progressShine {
+    to { background-position: 200% center; }
+}
+
+.question-card {
+    background:
+        radial-gradient(circle at 100% 0%, rgba(168, 85, 255, 0.1), transparent 40%),
+        radial-gradient(circle at 0% 100%, rgba(0, 212, 255, 0.1), transparent 40%),
+        rgba(255, 255, 255, 0.95);
+    border: 4px solid rgba(255, 255, 255, 0.9);
+    border-radius: 24px;
+    padding: 26px;
+    box-shadow:
+        0 18px 45px rgba(13, 27, 76, 0.15),
+        0 0 0 3px rgba(168, 85, 255, 0.2);
+}
+
+.question-category {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--purple), var(--pink));
+    color: white;
+    font-size: 13px;
+    font-weight: 900;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 16px rgba(168, 85, 255, 0.35);
+    letter-spacing: 0.3px;
+}
+
+.question {
+    font-size: clamp(19px, 3vw, 26px);
+    line-height: 1.4;
+    margin-bottom: 22px;
+    overflow-wrap: anywhere;
+    color: var(--navy);
+    font-weight: 800;
+}
+
+.answers {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.answer {
+    background: linear-gradient(160deg, #ffffff, #eef9ff);
+    border: 3px solid rgba(13, 27, 76, 0.1);
+    color: var(--navy);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+    transition: 0.2s;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    position: relative;
+}
+
+.answer:nth-child(1) { border-left: 5px solid var(--pink); }
+.answer:nth-child(2) { border-left: 5px solid var(--cyan); }
+.answer:nth-child(3) { border-left: 5px solid var(--yellow); }
+.answer:nth-child(4) { border-left: 5px solid var(--purple); }
+
+.answer:hover:not(:disabled) {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    background: white;
+}
+
+.answer:disabled { cursor: default; }
+
+.answer.correct {
+    background: linear-gradient(135deg, #d8ffd0, #b8ffb0);
+    border-color: #2ecc40;
+    border-left-color: #2ecc40;
+    color: #0a6b1a;
+    box-shadow: 0 0 20px rgba(46, 204, 64, 0.35);
+}
+
+.answer.incorrect {
+    background: linear-gradient(135deg, #ffe0ec, #ffc8dc);
+    border-color: var(--pink);
+    border-left-color: var(--pink);
+    color: #a00040;
+    box-shadow: 0 0 16px rgba(255, 45, 138, 0.25);
+}
+
+.feedback {
+    display: none;
+    margin-top: 18px;
+    padding: 15px 18px;
+    border-radius: 14px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.feedback.show { display: block; }
+
+.feedback.correct-feedback {
+    background: linear-gradient(90deg, rgba(93, 255, 74, 0.25), rgba(0, 212, 255, 0.15));
+    border: 3px solid #2ecc40;
+    color: #0a6b1a;
+}
+
+.feedback.wrong-feedback {
+    background: linear-gradient(90deg, rgba(255, 45, 138, 0.15), rgba(255, 140, 26, 0.1));
+    border: 3px solid var(--pink);
+    color: #a00040;
+}
+
+.next-btn {
+    display: none;
+    margin-top: 16px;
+}
+
+.next-btn.show { display: block; }
+
+.loading {
+    text-align: center;
+    padding: 55px 20px;
+}
+
+.spinner {
+    width: 56px;
+    height: 56px;
+    border: 6px solid rgba(0, 212, 255, 0.2);
+    border-top-color: var(--pink);
+    border-right-color: var(--purple);
+    border-bottom-color: var(--cyan);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+    box-shadow: 0 0 20px rgba(255, 45, 138, 0.3);
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.result-card { text-align: center; }
+
+.result-card h2 {
+    font-size: clamp(26px, 5vw, 36px);
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, var(--pink), var(--purple), var(--cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: 900;
+}
+
+.player-result {
+    color: var(--navy);
+    margin-bottom: 16px;
+    font-weight: 800;
+    opacity: 0.75;
+}
+
+.final-score {
+    font-size: clamp(48px, 9vw, 64px);
+    font-weight: 900;
+    background: linear-gradient(90deg, #ff2d8a, #a855ff, #00d4ff, #ffe03a);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: 22px;
+    animation: titleShift 3s linear infinite;
+    filter: drop-shadow(0 4px 8px rgba(255, 45, 138, 0.2));
+}
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.result-stat {
+    background: linear-gradient(160deg, #ffffff, #eef9ff);
+    border: 3px solid rgba(0, 212, 255, 0.2);
+    padding: 16px 8px;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.result-stat:nth-child(1) { border-color: rgba(93, 255, 74, 0.4); background: linear-gradient(160deg, #f0ffe8, #e0ffd0); }
+.result-stat:nth-child(2) { border-color: rgba(255, 45, 138, 0.35); background: linear-gradient(160deg, #fff0f6, #ffe0ec); }
+.result-stat:nth-child(3) { border-color: rgba(255, 140, 26, 0.4); background: linear-gradient(160deg, #fff5e8, #ffe8d0); }
+.result-stat:nth-child(4) { border-color: rgba(0, 212, 255, 0.4); background: linear-gradient(160deg, #e8faff, #d0f4ff); }
+.result-stat:nth-child(5) { border-color: rgba(168, 85, 255, 0.35); background: linear-gradient(160deg, #f5eeff, #ebe0ff); }
+.result-stat:nth-child(6) { border-color: rgba(255, 224, 58, 0.45); background: linear-gradient(160deg, #fffceb, #fff5c8); }
+
+.result-stat strong {
+    display: block;
+    font-size: 26px;
+    margin-bottom: 4px;
+    color: var(--navy);
+}
+
+.result-stat span {
+    color: var(--navy);
+    font-size: 12px;
+    font-weight: 800;
+    opacity: 0.7;
+}
+
+.best-record {
+    padding: 16px;
+    background: linear-gradient(90deg, rgba(255, 224, 58, 0.3), rgba(255, 140, 26, 0.25));
+    border: 3px solid rgba(255, 140, 26, 0.5);
+    border-radius: 16px;
+    margin-bottom: 18px;
+    font-weight: 900;
+    color: var(--navy);
+    box-shadow: 0 6px 18px rgba(255, 140, 26, 0.2);
+    font-size: 16px;
+}
+
+.result-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.home-btn {
+    background: linear-gradient(90deg, #0d1b4c, #1a2a6c);
+    box-shadow: 0 8px 22px rgba(13, 27, 76, 0.35);
+}
+
+@media (max-width: 750px) {
+    .topics { grid-template-columns: repeat(2, 1fr); }
+    .game-top { grid-template-columns: repeat(2, 1fr); }
+    .answers { grid-template-columns: 1fr; }
+    .cover { min-height: 500px; }
+}
+
+@media (max-width: 500px) {
+    body { padding: 10px; }
+    .card, .question-card { padding: 16px; }
+    .settings, .result-buttons { grid-template-columns: 1fr; }
+    .results-grid { grid-template-columns: repeat(2, 1fr); }
+    .timer { font-size: 24px; }
+    .cover-top { padding: 22px 18px 16px; }
+    .cover-title { letter-spacing: -1px; }
+    .cover-subtitle { letter-spacing: 3px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ========== PORTADA ========== -->
+<section id="coverScreen" class="screen active">
+    <div class="cover">
+        <div class="floating-shapes">
+            <div class="shape s1"></div>
+            <div class="shape s2"></div>
+            <div class="shape s3"></div>
+            <div class="shape s4"></div>
+            <div class="shape s5"></div>
+            <div class="shape s6"></div>
+            <div class="shape s7"></div>
+            <div class="shape s8"></div>
+        </div>
+        <div class="cover-top">
+            <div class="quiz-badge">
+                QUIZ
+                <div class="color-dots">
+                    <span></span><span></span><span></span>
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+            <h1 class="cover-title">TRIVIA</h1>
+            <p class="cover-subtitle">MASTER</p>
+            <div class="cover-visual">
+                <div class="wheel"></div>
+                <div class="sparkles">
+                    <div class="sparkle"></div>
+                    <div class="sparkle"></div>
+                    <div class="sparkle"></div>
+                    <div class="sparkle"></div>
+                    <div class="sparkle"></div>
+                    <div class="sparkle"></div>
+                </div>
+            </div>
+        </div>
+        <div class="cover-bottom">
+            <button id="coverPlayBtn" class="play-btn">JUGAR</button>
+        </div>
+    </div>
+</section>
+
+<!-- ========== CONFIGURACIÓN ========== -->
+<section id="startScreen" class="screen">
+    <div class="card">
+        <div class="logo">
+            <h1>🎮 TRIVIA MASTER</h1>
+            <p>Demuestra cuánto sabes</p>
+        </div>
+        <h3 class="section-title">👤 Nombre del jugador</h3>
+        <input id="playerName" class="name-input"
+               type="text" maxlength="25"
+               placeholder="Escribe tu nombre...">
+        <h3 class="section-title">📚 Elige tus temas</h3>
+        <div class="topics">
+            <button class="topic selected" data-category="general">🌎 General</button>
+            <button class="topic" data-category="historia">🏛️ Historia</button>
+            <button class="topic" data-category="matematicas">➗ Matemáticas</button>
+            <button class="topic" data-category="lenguaje">📖 Lenguaje</button>
+            <button class="topic" data-category="ciencias">🔬 Ciencias</button>
+            <button class="topic" data-category="geografia">🗺️ Geografía</button>
+            <button class="topic" data-category="deportes">🏅 Deportes</button>
+            <button class="topic" data-category="futbol">⚽ Fútbol</button>
+        </div>
+        <div class="settings">
+            <div class="setting-box">
+                <label for="questionCount">🔢 Número de preguntas</label>
+                <select id="questionCount">
+                    <option value="10">10 preguntas</option>
+                    <option value="15">15 preguntas</option>
+                    <option value="20" selected>20 preguntas</option>
+                    <option value="30">30 preguntas</option>
+                </select>
+            </div>
+            <div class="setting-box">
+                <label for="questionTime">⏱️ Tiempo por pregunta</label>
+                <select id="questionTime">
+                    <option value="10">10 segundos</option>
+                    <option value="15">15 segundos</option>
+                    <option value="20" selected>20 segundos</option>
+                    <option value="30">30 segundos</option>
+                </select>
+            </div>
+        </div>
+        <button id="startBtn" class="start-btn">🚀 COMENZAR JUEGO</button>
+    </div>
+</section>
+
+<section id="loadingScreen" class="screen">
+    <div class="card loading">
+        <div class="spinner"></div>
+        <h2 style="color:var(--navy);margin-bottom:8px;">Preparando preguntas...</h2>
+        <p id="loadingText" style="color:var(--muted);font-weight:600;">Conectando con la API...</p>
+    </div>
+</section>
+
+<section id="gameScreen" class="screen">
+    <div class="game-top">
+        <div class="stat">
+            <div class="stat-title">🏆 Puntos</div>
+            <div id="score" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+            <div class="stat-title">❓ Pregunta</div>
+            <div class="stat-value"><span id="currentQuestion">1</span>/<span id="totalQuestions">20</span></div>
+        </div>
+        <div class="stat timer-stat">
+            <div class="stat-title">⏰ ¡TIEMPO!</div>
+            <div id="timer" class="timer" role="timer" aria-live="off">20</div>
+        </div>
+        <div class="stat">
+            <div class="stat-title">✅ Correctas</div>
+            <div id="correctCount" class="stat-value">0</div>
+        </div>
+    </div>
+    <div class="progress-container"><div id="progress" class="progress"></div></div>
+    <div class="question-card">
+        <div id="questionCategory" class="question-category">🌎 General</div>
+        <div id="questionText" class="question">Cargando pregunta...</div>
+        <div id="answers" class="answers"></div>
+        <div id="feedback" class="feedback"></div>
+        <button id="nextBtn" class="next-btn">Siguiente pregunta ➜</button>
+    </div>
+</section>
+
+<section id="resultScreen" class="screen">
+    <div class="card result-card">
+        <h2>🎉 ¡Partida terminada!</h2>
+        <p id="playerResult" class="player-result">Jugador</p>
+        <div id="finalScore" class="final-score">0</div>
+        <div class="results-grid">
+            <div class="result-stat"><strong id="finalCorrect">0</strong><span>Correctas</span></div>
+            <div class="result-stat"><strong id="finalWrong">0</strong><span>Incorrectas</span></div>
+            <div class="result-stat"><strong id="finalTimeout">0</strong><span>Sin responder</span></div>
+            <div class="result-stat"><strong id="finalAccuracy">0%</strong><span>Precisión</span></div>
+            <div class="result-stat"><strong id="finalTime">0s</strong><span>Tiempo total</span></div>
+            <div class="result-stat"><strong id="finalQuestions">0</strong><span>Preguntas</span></div>
+        </div>
+        <div id="bestRecord" class="best-record">🏆 Récord: 0 puntos</div>
+        <div class="result-buttons">
+            <button id="restartBtn" class="restart-btn">🔄 Jugar nuevamente</button>
+            <button id="homeBtn" class="home-btn">🏠 Volver al inicio</button>
+        </div>
+    </div>
+</section>
+</div>
+
+<script>
+const API_URL = "https://the-trivia-api.com/v2/questions";
+const TRANSLATION_API = "https://api.mymemory.translated.net/get";
+const categories = {
+    general: { api: "general_knowledge", nombre: "General", icono: "🌎" },
+    historia: { api: "history", nombre: "Historia", icono: "🏛️" },
+    matematicas: { api: "science", nombre: "Matemáticas", icono: "➗" },
+    lenguaje: { api: "arts_and_literature", nombre: "Lenguaje", icono: "📖" },
+    ciencias: { api: "science", nombre: "Ciencias", icono: "🔬" },
+    geografia: { api: "geography", nombre: "Geografía", icono: "🗺️" },
+    deportes: { api: "sport_and_leisure", nombre: "Deportes", icono: "🏅" },
+    futbol: { api: "sport_and_leisure", nombre: "Fútbol", icono: "⚽" }
+};
+let selectedTopics = new Set(["general"]);
+let questions = [];
+let currentIndex = 0;
+let score = 0;
+let correctAnswers = 0;
+let wrongAnswers = 0;
+let timeoutAnswers = 0;
+let timer = null;
+let timeLeft = 20;
+let questionTime = 20;
+let totalGameTime = 0;
+let playerName = "";
+let usedQuestionIds = new Set();
+let questionStartTime = 0;
+let questionLocked = false;
+
+const $ = id => document.getElementById(id);
+
+function showScreen(screen) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    screen.classList.add("active");
+}
+
+// Botón de la portada → configuración
+$("coverPlayBtn").addEventListener("click", () => {
+    showScreen($("startScreen"));
+});
+
+document.querySelectorAll(".topic").forEach(button => {
+    button.addEventListener("click", () => {
+        const category = button.dataset.category;
+        if (selectedTopics.has(category)) {
+            if (selectedTopics.size > 1) {
+                selectedTopics.delete(category);
+                button.classList.remove("selected");
+            }
+        } else {
+            selectedTopics.add(category);
+            button.classList.add("selected");
+        }
+    });
+});
+
+function normalizeText(text) {
+    return String(text || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
+function isAmericanFootball(question) {
+    const text = normalizeText([
+        question.question?.text || "",
+        question.correctAnswer || "",
+        ...(question.incorrectAnswers || []),
+        ...(question.tags || [])
+    ].join(" "));
+    const terms = [
+        "american football", "national football league",
+        "nfl", "touchdown", "quarterback", "running back",
+        "wide receiver", "tight end", "linebacker",
+        "offensive line", "field goal", "super bowl",
+        "superbowl", "end zone", "endzone", "gridiron",
+        "first down", "second down", "third down",
+        "fourth down", "yard line"
+    ];
+    return terms.some(term => text.includes(term));
+}
+
+function isSoccerQuestion(question) {
+    if (isAmericanFootball(question)) return false;
+    const text = normalizeText([
+        question.question?.text || "",
+        question.correctAnswer || "",
+        ...(question.incorrectAnswers || []),
+        ...(question.tags || [])
+    ].join(" "));
+    const terms = [
+        "soccer", "fifa", "uefa", "world cup",
+        "champions league", "europa league",
+        "premier league", "la liga", "serie a",
+        "bundesliga", "ligue 1", "goalkeeper",
+        "striker", "midfielder", "offside",
+        "penalty", "free kick", "corner kick",
+        "red card", "yellow card", "real madrid",
+        "barcelona", "manchester united", "manchester city",
+        "liverpool", "arsenal", "chelsea", "juventus",
+        "bayern", "psg", "boca juniors", "river plate",
+        "colo colo", "messi", "cristiano ronaldo",
+        "pele", "maradona", "neymar", "mbappe",
+        "haaland", "alexis sanchez", "footballer",
+        "football association"
+    ];
+    return terms.some(term => text.includes(term));
+}
+
+function createApiUrl(category, amount, topic) {
+    const params = new URLSearchParams();
+    params.set("limit", Math.min(amount, 50));
+    params.set("types", "text_choice");
+    params.set("contentFilter", "family");
+    if (topic === "futbol") {
+        params.set("categories", "sport_and_leisure");
+        params.set("tags", "football");
+    } else {
+        params.set("categories", category);
+    }
+    return `${API_URL}?${params.toString()}`;
+}
+
+function shuffleArray(array) {
+    const copy = [...array];
+    for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+}
+
+async function translateText(text) {
+    if (!text) return text;
+    try {
+        const url = `${TRANSLATION_API}?q=${encodeURIComponent(text)}&langpair=en|es`;
+        const response = await fetch(url);
+        if (!response.ok) return text;
+        const data = await response.json();
+        const translated = data?.responseData?.translatedText;
+        return translated || text;
+    } catch (error) {
+        console.warn("No se pudo traducir:", error);
+        return text;
+    }
+}
+
+async function translateQuestion(question) {
+    const texts = [
+        question.question.text,
+        question.correctAnswer,
+        ...question.incorrectAnswers.slice(0, 3)
+    ];
+    const translated = await Promise.all(texts.map(translateText));
+    return {
+        ...question,
+        question: { ...question.question, text: translated[0] },
+        correctAnswer: translated[1],
+        incorrectAnswers: translated.slice(2)
+    };
+}
+
+async function fetchQuestions() {
+    const wantedAmount = Number($("questionCount").value);
+    const topics = [...selectedTopics];
+    const perCategory = Math.ceil(wantedAmount / topics.length);
+    const allQuestions = [];
+    usedQuestionIds.clear();
+
+    for (const topic of topics) {
+        const category = categories[topic];
+        $("loadingText").textContent = `Buscando preguntas de ${category.nombre}...`;
+        const amount = topic === "futbol"
+            ? Math.min(Math.max(perCategory * 5, 30), 50)
+            : Math.min(perCategory + 10, 50);
+        try {
+            const response = await fetch(createApiUrl(category.api, amount, topic));
+            if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
+            const data = await response.json();
+            for (const question of data) {
+                if (!question.id || usedQuestionIds.has(question.id)) continue;
+                if (!question.question?.text || !question.correctAnswer) continue;
+                if (!Array.isArray(question.incorrectAnswers) ||
+                    question.incorrectAnswers.length < 3) continue;
+                if (topic === "futbol" && !isSoccerQuestion(question)) continue;
+                question.gameCategory = topic;
+                usedQuestionIds.add(question.id);
+                allQuestions.push(question);
+            }
+        } catch (error) {
+            console.error(`Error cargando ${category.nombre}:`, error);
+        }
+    }
+
+    const shuffled = shuffleArray(allQuestions).slice(0, wantedAmount);
+    const translatedQuestions = [];
+    for (let i = 0; i < shuffled.length; i++) {
+        $("loadingText").textContent =
+            `Preparando pregunta ${i + 1} de ${shuffled.length}...`;
+        translatedQuestions.push(await translateQuestion(shuffled[i]));
+    }
+    return translatedQuestions;
+}
+
+$("startBtn").addEventListener("click", startGame);
+
+async function startGame() {
+    playerName = $("playerName").value.trim() || "Jugador";
+    questionTime = Number($("questionTime").value) || 20;
+    currentIndex = 0;
+    score = 0;
+    correctAnswers = 0;
+    wrongAnswers = 0;
+    timeoutAnswers = 0;
+    totalGameTime = 0;
+    questionLocked = false;
+    $("score").textContent = "0";
+    $("correctCount").textContent = "0";
+    showScreen($("loadingScreen"));
+    try {
+        questions = await fetchQuestions();
+        if (!questions.length) {
+            throw new Error("No se encontraron preguntas compatibles.");
+        }
+        $("totalQuestions").textContent = questions.length;
+        if (questions.length < Number($("questionCount").value)) {
+            $("loadingText").textContent =
+                `Se encontraron ${questions.length} preguntas. La partida comenzará con ellas.`;
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        showScreen($("gameScreen"));
+        loadQuestion();
+    } catch (error) {
+        console.error(error);
+        alert("No se pudieron cargar las preguntas. Comprueba tu conexión e inténtalo de nuevo.");
+        showScreen($("startScreen"));
+    }
+}
+
+function loadQuestion() {
+    clearInterval(timer);
+    questionLocked = false;
+    if (currentIndex >= questions.length) {
+        endGame();
+        return;
+    }
+    const question = questions[currentIndex];
+    const category = categories[question.gameCategory];
+    $("currentQuestion").textContent = currentIndex + 1;
+    $("progress").style.width = `${((currentIndex + 1) / questions.length) * 100}%`;
+    $("questionCategory").textContent = `${category.icono} ${category.nombre}`;
+    $("questionText").textContent = question.question.text;
+    $("answers").innerHTML = "";
+    $("feedback").className = "feedback";
+    $("feedback").textContent = "";
+    $("nextBtn").classList.remove("show");
+
+    const answers = shuffleArray([
+        { text: question.correctAnswer, correct: true },
+        ...question.incorrectAnswers.slice(0, 3).map(text => ({
+            text, correct: false
+        }))
+    ]);
+
+    answers.forEach((answer, index) => {
+        const button = document.createElement("button");
+        button.className = "answer";
+        button.textContent = `${String.fromCharCode(65 + index)}. ${answer.text}`;
+        button.dataset.correct = String(answer.correct);
+        button.addEventListener("click", () => selectAnswer(button, answer.correct));
+        $("answers").appendChild(button);
+    });
+
+    timeLeft = questionTime;
+    $("timer").textContent = timeLeft;
+    $("timer").classList.remove("danger");
+    questionStartTime = Date.now();
+    startTimer();
+}
+
+function startTimer() {
+    clearInterval(timer);
+    timer = setInterval(() => {
+        timeLeft--;
+        $("timer").textContent = timeLeft;
+        if (timeLeft <= 5) {
+            $("timer").classList.add("danger");
+        }
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            timeOut();
+        }
+    }, 1000);
+}
+
+function lockAnswers() {
+    document.querySelectorAll(".answer").forEach(button => {
+        button.disabled = true;
+        if (button.dataset.correct === "true") {
+            button.classList.add("correct");
+        }
+    });
+}
+
+function selectAnswer(selectedButton, isCorrect) {
+    if (questionLocked) return;
+    questionLocked = true;
+    clearInterval(timer);
+    const question = questions[currentIndex];
+    const elapsed = Math.min(
+        questionTime,
+        Math.round((Date.now() - questionStartTime) / 1000)
+    );
+    totalGameTime += elapsed;
+    lockAnswers();
+
+    if (isCorrect) {
+        selectedButton.classList.add("correct");
+        correctAnswers++;
+        const points = 100 + Math.max(0, timeLeft * 10);
+        score += points;
+        $("score").textContent = score;
+        $("correctCount").textContent = correctAnswers;
+        $("feedback").className = "feedback show correct-feedback";
+        $("feedback").textContent =
+            `✅ ¡Correcto! +${points} puntos. Respondiste en ${elapsed} segundos.`;
+    } else {
+        selectedButton.classList.add("incorrect");
+        wrongAnswers++;
+        $("feedback").className = "feedback show wrong-feedback";
+        $("feedback").textContent =
+            `❌ Incorrecto. La respuesta correcta era: ${question.correctAnswer}`;
+    }
+    $("nextBtn").classList.add("show");
+}
+
+function timeOut() {
+    if (questionLocked) return;
+    questionLocked = true;
+    const question = questions[currentIndex];
+    totalGameTime += questionTime;
+    timeoutAnswers++;
+    lockAnswers();
+    $("feedback").className = "feedback show wrong-feedback";
+    $("feedback").textContent =
+        `⏰ ¡Se acabó el tiempo! La respuesta correcta era: ${question.correctAnswer}`;
+    $("nextBtn").classList.add("show");
+}
+
+$("nextBtn").addEventListener("click", () => {
+    if (!questionLocked) return;
+    currentIndex++;
+    loadQuestion();
+});
+
+function endGame() {
+    clearInterval(timer);
+    const total = questions.length;
+    const accuracy = total ? Math.round(correctAnswers / total * 100) : 0;
+    const recordKey = "triviaMasterRecord";
+    const previousRecord = Number(localStorage.getItem(recordKey) || 0);
+    const isNewRecord = score > previousRecord;
+    if (isNewRecord) localStorage.setItem(recordKey, String(score));
+
+    $("playerResult").textContent = `Jugador: ${playerName}`;
+    $("finalScore").textContent = score;
+    $("finalCorrect").textContent = correctAnswers;
+    $("finalWrong").textContent = wrongAnswers;
+    $("finalTimeout").textContent = timeoutAnswers;
+    $("finalAccuracy").textContent = `${accuracy}%`;
+    $("finalTime").textContent = `${totalGameTime}s`;
+    $("finalQuestions").textContent = total;
+    $("bestRecord").textContent = isNewRecord
+        ? `🏆 ¡Nuevo récord! ${score} puntos`
+        : `🏆 Récord personal: ${Math.max(score, previousRecord)} puntos`;
+    showScreen($("resultScreen"));
+}
+
+$("restartBtn").addEventListener("click", startGame);
+
+$("homeBtn").addEventListener("click", () => {
+    clearInterval(timer);
+    showScreen($("coverScreen"));
+});
+</script>
+</body>
+</html>
